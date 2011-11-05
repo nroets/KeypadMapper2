@@ -39,12 +39,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 final class Gps implements LocationListener {
+	public PowerManager.WakeLock wl;
 	public double lon = -200, lat, bearing;
 	public int record = 0, osmid = 0;
-	public TextView tw = null;
-	public RandomAccessFile out, osm;
+    public TextView tw = null;
+    public RandomAccessFile out, osm;
     public java.text.SimpleDateFormat f = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	public LocationManager lm;
+    public LocationManager lm;
     public void onProviderDisabled(String provider) {}
     public void onProviderEnabled(String provider) {}
     public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -119,10 +120,11 @@ public class KeypadMapper2Activity extends Activity { //implements LocationListe
           	  }
           	  public void onClick (View v) {
           		  	if (v == findViewById (R.id.button_Stop)) {
-                		gps.lm.removeUpdates(gps);
+      				  	gps.wl.release ();
+	                		gps.lm.removeUpdates(gps);
           		  		gps.record = 0;
           		  		finish ();
-                	}
+        	        	}
           		  	else {
           		  		if (v == findViewById (R.id.button_C)) val = "";
           		  		else if (v == findViewById (R.id.button_DEL)) {
@@ -150,6 +152,9 @@ public class KeypadMapper2Activity extends Activity { //implements LocationListe
         if (gps != null) gps.tw = (TextView) findViewById (R.id.text);
         else {
         	gps = new Gps ();
+        	PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        	gps.wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WildlifeSurvey");
+        	gps.wl.acquire ();
         	gps.tw = (TextView) findViewById (R.id.text);
         	gps.out = null;
         	gps.f.setTimeZone(TimeZone.getTimeZone("UTC"));
