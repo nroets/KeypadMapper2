@@ -190,6 +190,7 @@ public class KeypadMapper2Activity extends Activity { //implements LocationListe
         gps.tw = (TextView) findViewById (R.id.text);
     	super.onResume();
     	if (gps.record == 0) {
+        	gps.wl.acquire ();
     		gps.lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 6f, gps);
     		gps.record = 1;
     		gps.lon = -200;
